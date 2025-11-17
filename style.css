@@ -28,12 +28,14 @@ main {
     margin-bottom: 20px;
 }
 
-#study-form label, #study-form input[type="text"] {
+#study-form label,
+#study-form input[type="text"] {
     display: block;
     margin-bottom: 10px;
 }
 
-#study-form input[type="text"], #flash-write-input {
+#study-form input[type="text"],
+#flash-write-input {
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
@@ -98,7 +100,7 @@ main {
 
 .flashcard-wrapper {
     position: relative;
-    height: 150px; /* Altura padrão para os cards */
+    height: 150px;
 }
 
 .flashcard {
@@ -116,7 +118,8 @@ main {
     transform: rotateY(180deg);
 }
 
-.front, .back {
+.front,
+.back {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -131,13 +134,13 @@ main {
 }
 
 .front {
-    background-color: #f8d7da; /* Light Red */
+    background-color: #f8d7da;
     color: #721c24;
     font-weight: bold;
 }
 
 .back {
-    background-color: #d4edda; /* Light Green */
+    background-color: #d4edda;
     color: #155724;
     transform: rotateY(180deg);
 }
@@ -147,7 +150,8 @@ main {
     text-align: center;
 }
 
-.edit-button, .delete-button {
+.edit-button,
+.delete-button {
     padding: 5px 10px;
     border: none;
     border-radius: 4px;
@@ -155,8 +159,15 @@ main {
     margin: 0 5px;
 }
 
-.edit-button { background-color: #ffc107; color: #333; }
-.delete-button { background-color: #dc3545; color: white; }
+.edit-button {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.delete-button {
+    background-color: #dc3545;
+    color: white;
+}
 
 /* Edit Mode */
 .flashcard.editing {
@@ -165,7 +176,9 @@ main {
     padding: 10px;
     height: auto;
 }
-.flashcard.editing input, .flashcard.editing textarea {
+
+.flashcard.editing input,
+.flashcard.editing textarea {
     width: 100%;
     margin-bottom: 5px;
     padding: 5px;
@@ -177,12 +190,19 @@ main {
     resize: vertical;
 }
 
-.save-button { background-color: #007bff; color: white; }
-.cancel-button { background-color: #6c757d; color: white; }
+.save-button {
+    background-color: #007bff;
+    color: white;
+}
 
+.cancel-button {
+    background-color: #6c757d;
+    color: white;
+}
 
-/* --- Simulado and V/F --- */
-#simulado-container, #verdadeiro-falso-container {
+/* --- Simulado & V/F --- */
+#simulado-container,
+#verdadeiro-falso-container {
     padding-top: 15px;
 }
 
@@ -211,7 +231,8 @@ main {
     background-color: #f0f0f0;
 }
 
-.check-button, .start-button {
+.check-button,
+.start-button {
     display: block;
     width: 100%;
     padding: 12px;
@@ -236,8 +257,13 @@ main {
     text-align: center;
 }
 
-.correct { color: #28a745; }
-.incorrect { color: #dc3545; }
+.correct {
+    color: #28a745;
+}
+
+.incorrect {
+    color: #dc3545;
+}
 
 /* --- Flash Write --- */
 #flash-write-input {
@@ -252,9 +278,11 @@ main {
     border-radius: 6px;
     background-color: #f8f9fa;
 }
+
 .write-result-block p {
     margin: 5px 0;
 }
+
 .correct-answer {
     background-color: #d4edda;
     padding: 5px;
