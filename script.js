@@ -1,5 +1,5 @@
 const STORAGE_KEY = 'studyApp_data';
-const MAX_ITENS = 25; // Limite de itens a serem exibidos por sessão
+const MAX_ITENS = 55; // Limite de itens a serem exibidos por sessão
 let editingIndex = -1; // Rastreia o índice do item em edição
 
 // --- NOVAS VARIÁVEIS DE CONTROLE PARA O FLASH WRITE ---
