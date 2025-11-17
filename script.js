@@ -6,11 +6,13 @@ let editingIndex = -1; // Rastreia o índice do item em edição
 const FLASH_WRITE_TIME_SECONDS = 20;
 let flashWriteTimer;
 let currentFlashWriteQuestionIndex = 0;
-let currentFlashWriteData = []; // Armazena os 25 itens da sessão atual
+let currentFlashWriteData = []; // Armazena os 5 itens da sessão atual
+let flashWriteRunning = false;
 // ---------------------------------------------------
 
 
 // --- DADOS INICIAIS (BASE DE DADOS JURÍDICA) ---
+// MANTIDO COMO ARRAY DE ARRAY PARA ORGANIZAÇÃO, MAS SERÁ "ACHATADO" NO CARREGAMENTO
 const INITIAL_JURIDICAL_DATA = [
     [
         {
@@ -373,154 +375,125 @@ const INITIAL_JURIDICAL_DATA = [
           pergunta: "O que é **Decadência**?",
           resposta: "Perda do **próprio direito material** (potestativo) em razão do decurso do tempo."
         },
-        
-            {
-              pergunta: "O que é Contrato?",
-              resposta: "Acordo de vontades entre duas ou mais pessoas, que visa criar, modificar ou extinguir direitos e obrigações (Negócio Jurídico bilateral)."
-            },
-            {
-              pergunta: "Quais são os 3 Princípios Fundamentais da Teoria Contratual?",
-              resposta: "Autonomia da Vontade (liberdade de contratar), Força Obrigatória (pacta sunt servanda) e Boa-fé Objetiva."
-            },
-            {
-              pergunta: "Defina o Princípio da Boa-fé Objetiva.",
-              resposta: "Impõe aos contratantes um dever de agir com honestidade, lealdade e cooperação, antes, durante e após o contrato (Art. 422, CC)."
-            },
-            {
-              pergunta: "O que significa **Pacta Sunt Servanda**?",
-              resposta: "A força obrigatória dos contratos. O acordo faz lei entre as partes e deve ser cumprido."
-            },
-            {
-              pergunta: "O que é **Função Social do Contrato**?",
-              resposta: "O contrato não pode servir apenas aos interesses das partes, mas deve observar o interesse da coletividade, limitando a autonomia da vontade."
-            },
-            {
-              pergunta: "Defina a **Revisão Contratual** (Teoria da Imprevisão/Onerosidade Excessiva).",
-              resposta: "Possibilidade de alterar o contrato se eventos supervenientes, imprevisíveis e extraordinários tornarem a obrigação excessivamente onerosa para uma das partes (Art. 478, CC)."
-            },
-            {
-              pergunta: "Qual a diferença entre Contrato Unilateral e Bilateral?",
-              resposta: "Bilateral gera obrigações para ambas as partes (Ex: compra e venda). Unilateral gera obrigação apenas para uma parte (Ex: doação pura)."
-            },
-            {
-              pergunta: "O que é um Contrato Oneroso?",
-              resposta: "Aquele em que ambas as partes obtêm vantagens, sofrendo o correspondente sacrifício patrimonial (Ex: locação, ambas dão e recebem)."
-            },
-            {
-              pergunta: "O que é um Contrato Gratuito (ou Benéfico)?",
-              resposta: "Aquele em que apenas uma das partes obtém vantagem, e a outra, o sacrifício (Ex: doação pura, comodato)."
-            },
-            {
-              pergunta: "O que é **Vício Redibitório**?",
-              resposta: "Defeito oculto em coisa recebida em contrato comutativo (oneroso), que a torna imprópria ao uso ou lhe diminui o valor."
-            },
-            {
-              pergunta: "O que é **Evicção**?",
-              resposta: "Perda da posse ou propriedade de um bem, em virtude de uma sentença judicial que reconhece direito anterior de um terceiro."
-            },
-            {
-              pergunta: "O que são **Arras** ou **Sinal**?",
-              resposta: "Valor ou bem entregue por um contratante ao outro no momento da conclusão do contrato, para confirmar o acordo (Arras Confirmatórias) ou servir como cláusula penal (Arras Penitenciais)."
-            },
-            {
-              pergunta: "O que é **Cláusula Penal** (Multa Contratual)?",
-              resposta: "É a penalidade (multa) inserida no contrato, que pode ser exigida em caso de inexecução total ou atraso (mora) no cumprimento da obrigação."
-            },
-            {
-              pergunta: "O que é **Exceção do Contrato Não Cumprido**?",
-              resposta: "Em contratos bilaterais, uma parte pode se recusar a cumprir sua obrigação enquanto a outra não cumprir a dela (Art. 476, CC)."
-            },
-            {
-              pergunta: "Qual a principal característica de um Contrato de Adesão?",
-              resposta: "As cláusulas são estabelecidas previamente por uma das partes, não permitindo à outra discutir ou modificar o conteúdo, apenas aceitar ou rejeitar."
-            },
             
-              // --- Bloco 1: Conceito e Princípios ---
-              {
-                pergunta: "Como se conceitua um **Contrato** no âmbito jurídico (incluindo validade e efeitos)?",
-                resposta: "Acordo **bilateral de vontades**, **isento de mácula**, entre **capazes**, de **forma prescrita ou não vedada em lei**, criador de **direitos e obrigações recíprocos e equivalentes** (comutativos)."
-              },
-              {
-                pergunta: "Quais são os **três grandes requisitos** de validade do negócio jurídico (e do contrato) previstos no **Art. 104 do CC**?",
-                resposta: "1. **Agente capaz**; 2. **Objeto lícito, possível, determinado ou determinável**; 3. **Forma prescrita ou não defesa em lei**."
-              },
-              {
-                pergunta: "O que é o requisito da **Comutatividade** e em quais contratos ele se aplica?",
-                resposta: "É o **estabelecimento de direitos e obrigações recíprocas e equivalentes** (equilíbrio) e se aplica especificamente aos **contratos bilaterais**."
-              },
-              {
-                pergunta: "Quais princípios devem ser guardados na execução do contrato, conforme o Código Civil?",
-                resposta: "Os princípios da **Probidade** e da **Boa-Fé** (Boa-Fé Objetiva)."
-              },
-              {
-                pergunta: "Qual princípio limita a liberdade de contratar?",
-                resposta: "A **Função Social do Contrato**. A liberdade deve ser exercida 'em razão e nos limites da função social do contrato'."
-              },
-              // --- Bloco 2: Requisitos de Validade (Art. 104 CC) ---
-              {
-                pergunta: "**Requisito Subjetivo:** O que é exigido quanto ao agente (as partes) para a validade do contrato?",
-                resposta: "Deve ser um **Agente Capaz** (Capacidade Jurídica) e ter **Consentimento/Vontade** livre e **isento de mácula** (sem vícios)."
-              },
-              {
-                pergunta: "Se for um agente **incapaz**, como ele participa de um contrato válido?",
-                resposta: "Deve estar devidamente **representado** (absolutamente incapaz) ou **assistido** (relativamente incapaz) por seus responsáveis legais."
-              },
-              {
-                pergunta: "Quais são as três características exigidas para o **Objeto** do contrato?",
-                resposta: "Deve ser **Lícito**, **Possível** (física e juridicamente) e **Determinado ou Determinável**."
-              },
-              {
-                pergunta: "O que significa dizer que o objeto deve ser **juridicamente possível**?",
-                resposta: "Significa que o objeto **não pode ser proibido por lei** (Ex: Venda de herança de pessoa viva)."
-              },
-              {
-                pergunta: "**Requisito Formal:** Qual a regra geral sobre a forma dos contratos no Direito brasileiro?",
-                resposta: "**Liberdade de Forma (Consensualismo)**. Em regra, pode ser verbal, escrito particular ou tácito."
-              },
-              {
-                pergunta: "O que é a **Formalidade *Ad Solemnitatem*** e qual seu efeito se não for observada?",
-                resposta: "É a **forma especial que a lei exige** expressamente para a validade do contrato (forma *prescrita*). Se não for observada, o contrato será **nulo**."
-              },
-              {
-                pergunta: "Segundo o Art. 5º do CC, quais são três formas de se adquirir a **Capacidade Jurídica** (emancipação) entre 16 e 18 anos?",
-                resposta: "**Casamento**; **Colação de Grau** do Ensino Superior; ou **Estabelecimento Civil/Comercial** ou **Relação de Emprego com economia própria**."
-              },
-              // --- Bloco 3: Etapas de Formação (Iter Contratual) ---
-              {
-                pergunta: "Qual é a **primeira etapa** da formação do contrato e qual seu efeito jurídico?",
-                resposta: "**Negociações Preliminares** (Pontuação/Tratativas). Em regra, **não há vinculação contratual**, mas exige-se **boa-fé** (Responsabilidade Pré-Contratual)."
-              },
-              {
-                pergunta: "O que é a **Proposta** (ou Policitação)?",
-                resposta: "É a **manifestação unilateral de vontade** do proponente, **clara, completa** e dirigida a outro, com o intuito de celebrar o contrato."
-              },
-              {
-                pergunta: "Qual o efeito jurídico da Proposta?",
-                resposta: "Em regra, a proposta **obriga o proponente** (Art. 427 do CC), que não pode se retratar sem justa causa."
-              },
-              {
-                pergunta: "Qual a **última etapa** da formação do contrato e o que ela provoca?",
-                resposta: "**Aceitação**. Sua manifestação **aperfeiçoa/conclui o contrato**, fazendo-o nascer para o mundo jurídico."
-              },
-              {
-                pergunta: "O que ocorre se a **Aceitação** for dada com alterações ou condições diferentes da Proposta?",
-                resposta: "Ela perde o caráter de aceitação e se transforma em uma **nova Proposta** (**Contraproposta**), invertendo os papéis das partes."
-              }
+        {
+          pergunta: "O que é Contrato?",
+          resposta: "Acordo de vontades entre duas ou mais pessoas, que visa criar, modificar ou extinguir direitos e obrigações (Negócio Jurídico bilateral)."
+        },
+        {
+          pergunta: "Quais são os 3 Princípios Fundamentais da Teoria Contratual?",
+          resposta: "Autonomia da Vontade (liberdade de contratar), Força Obrigatória (pacta sunt servanda) e Boa-fé Objetiva."
+        },
+        {
+          pergunta: "Defina o Princípio da Boa-fé Objetiva.",
+          resposta: "Impõe aos contratantes um dever de agir com honestidade, lealdade e cooperação, antes, durante e após o contrato (Art. 422, CC)."
+        },
+        {
+          pergunta: "O que significa **Pacta Sunt Servanda**?",
+          resposta: "A força obrigatória dos contratos. O acordo faz lei entre as partes e deve ser cumprido."
+        },
+        {
+          pergunta: "O que é **Função Social do Contrato**?",
+          resposta: "O contrato não pode servir apenas aos interesses das partes, mas deve observar o interesse da coletividade, limitando a autonomia da vontade."
+        },
+        {
+          pergunta: "Defina a **Revisão Contratual** (Teoria da Imprevisão/Onerosidade Excessiva).",
+          resposta: "Possibilidade de alterar o contrato se eventos supervenientes, imprevisíveis e extraordinários tornarem a obrigação excessivamente onerosa para uma das partes (Art. 478, CC)."
+        },
+        {
+          pergunta: "Qual a diferença entre Contrato Unilateral e Bilateral?",
+          resposta: "Bilateral gera obrigações para ambas as partes (Ex: compra e venda). Unilateral gera obrigação apenas para uma parte (Ex: doação pura)."
+        },
+        {
+          pergunta: "O que é um Contrato Oneroso?",
+          resposta: "Aquele em que ambas as partes obtêm vantagens, sofrendo o correspondente sacrifício patrimonial (Ex: locação, ambas dão e recebem)."
+        },
+        {
+          pergunta: "O que é um Contrato Gratuito (ou Benéfico)?",
+          resposta: "Aquele em que apenas uma das partes obtém vantagem, e a outra, o sacrifício (Ex: doação pura, comodato)."
+        },
+        {
+          pergunta: "O que é **Vício Redibitório**?",
+          resposta: "Defeito oculto em coisa recebida em contrato comutativo (oneroso), que a torna imprópria ao uso ou lhe diminui o valor."
+        },
+        {
+          pergunta: "O que é **Evicção**?",
+          resposta: "Perda da posse ou propriedade de um bem, em virtude de uma sentença judicial que reconhece direito anterior de um terceiro."
+        },
+        {
+          pergunta: "O que são **Arras** ou **Sinal**?",
+          resposta: "Valor ou bem entregue por um contratante ao outro no momento da conclusão do contrato, para confirmar o acordo (Arras Confirmatórias) ou servir como cláusula penal (Arras Penitenciais)."
+        },
+        {
+          pergunta: "O que é **Cláusula Penal** (Multa Contratual)?",
+          resposta: "É a penalidade (multa) inserida no contrato, que pode ser exigida em caso de inexecução total ou atraso (mora) no cumprimento da obrigação."
+        },
+        {
+          pergunta: "O que é **Exceção do Contrato Não Cumprido**?",
+          resposta: "Em contratos bilaterais, uma parte pode se recusar a cumprir sua obrigação enquanto a outra não cumprir a dela (Art. 476, CC)."
+        },
+        {
+          pergunta: "Qual a principal característica de um Contrato de Adesão?",
+          resposta: "As cláusulas são estabelecidas previamente por uma das partes, não permitindo à outra discutir ou modificar o conteúdo, apenas aceitar ou rejeitar."
+        },
             
-      ]
-      
-              
-      
-
+          // --- Bloco 1: Conceito e Princípios ---
+          {
+            pergunta: "Como se conceitua um **Contrato** no âmbito jurídico (incluindo validade e efeitos)?",
+            resposta: "Acordo **bilateral de vontades**, **isento de mácula**, entre **capazes**, de **forma prescrita ou não vedada em lei**, criador de **direitos e obrigações recíprocos e equivalentes** (comutativos)."
+          },
+          {
+            pergunta: "Quais são os **três grandes requisitos** de validade do negócio jurídico (e do contrato) previstos no **Art. 104 do CC**?",
+            resposta: "1. **Agente capaz**; 2. **Objeto lícito, possível, determinado ou determinável**; 3. **Forma prescrita ou não defesa em lei**."
+          },
+          {
+            pergunta: "O que é o requisito da **Comutatividade** e em quais contratos ele se aplica?",
+            resposta: "É o **estabelecimento de direitos e obrigações recíprocas e equivalentes** (equilíbrio) e se aplica especificamente aos **contratos bilaterais**."
+          },
+          {
+            pergunta: "Quais princípios devem ser guardados na execução do contrato, conforme o Código Civil?",
+            resposta: "Os princípios da **Probidade** e da **Boa-Fé** (Boa-Fé Objetiva)."
+          },
+          {
+            pergunta: "Qual princípio limita a liberdade de contratar?",
+            resposta: "A **Função Social do Contrato**. A liberdade deve ser exercida 'em razão e nos limites da função social do contrato'."
+          },
+          {
+            pergunta: "O que é a **Formalidade *Ad Solemnitatem*** e qual seu efeito se não for observada?",
+            resposta: "É a **forma especial que a lei exige** expressamente para a validade do contrato (forma *prescrita*). Se não for observada, o contrato será **nulo**."
+          },
+          {
+            pergunta: "Segundo o Art. 5º do CC, quais são três formas de se adquirir a **Capacidade Jurídica** (emancipação) entre 16 e 18 anos?",
+            resposta: "**Casamento**; **Colação de Grau** do Ensino Superior; ou **Estabelecimento Civil/Comercial** ou **Relação de Emprego com economia própria**."
+          },
+          {
+            pergunta: "O que é a **Proposta** (ou Policitação)?",
+            resposta: "É a **manifestação unilateral de vontade** do proponente, **clara, completa** e dirigida a outro, com o intuito de celebrar o contrato."
+          },
+          {
+            pergunta: "Qual o efeito jurídico da Proposta?",
+            resposta: "Em regra, a proposta **obriga o proponente** (Art. 427 do CC), que não pode se retratar sem justa causa."
+          },
+          {
+            pergunta: "O que ocorre se a **Aceitação** for dada com alterações ou condições diferentes da Proposta?",
+            resposta: "Ela perde o caráter de aceitação e se transforma em uma **nova Proposta** (**Contraproposta**), invertendo os papéis das partes."
+          }
+    ]
 ];
 // --------------------------------------------------
 
 
-// --- PERSISTÊNCIA E INICIALIZAÇÃO ---
+// --- PERSISTÊNCIA E INICIALIZAÇÃO (CORRIGIDO) ---
 
 function loadStudyData() {
     const savedData = localStorage.getItem(STORAGE_KEY);
-    return savedData ? JSON.parse(savedData) : [];
+    let data = savedData ? JSON.parse(savedData) : [];
+    
+    // CORREÇÃO: Achata o array se ele foi salvo na estrutura aninhada acidentalmente
+    if (Array.isArray(data) && data.length > 0 && Array.isArray(data[0]) && data[0].pergunta === undefined) {
+        return data.flat();
+    }
+    return data;
 }
 
 function saveStudyData() {
@@ -528,8 +501,9 @@ function saveStudyData() {
 }
 
 function loadInitialData() {
-    if (studyData.length === 0) {
-        studyData = INITIAL_JURIDICAL_DATA;
+    // CORREÇÃO: Usa .flat() para garantir que studyData seja um array de objetos simples, se estiver vazio.
+    if (!studyData || studyData.length === 0 || Array.isArray(studyData[0])) {
+        studyData = INITIAL_JURIDICAL_DATA.flat();
         saveStudyData(); 
     }
 }
@@ -545,12 +519,13 @@ loadInitialData();
  * Garante que a seleção é diferente a cada chamada (a cada recarga/alternância de aba).
  * @returns {Array} Array de dados limitado e aleatório.
  */
-function getShuffledAndLimitedData() {
+function getShuffledAndLimitedData(limit = MAX_ITENS) {
+    if (studyData.length === 0) return [];
     const dataCopy = [...studyData];
     // Embaralha
     const shuffled = dataCopy.sort(() => 0.5 - Math.random());
     // Limita
-    return shuffled.slice(0, MAX_ITENS);
+    return shuffled.slice(0, limit);
 }
 
 
@@ -562,19 +537,20 @@ function showTab(tabId) {
     document.querySelector(`.tab-button[onclick="showTab('${tabId}')"]`).classList.add('active');
     
     // Força a renderização aleatória e limitada ao trocar de aba
+    // Reseta o estado do Flash Write se sair da aba
+    if (flashWriteRunning && tabId !== 'flash-write') {
+        stopFlashWriteTimer();
+    }
+
     if (tabId === 'flashcards') renderFlashCards();
     if (tabId === 'simulado') renderSimulado();
     if (tabId === 'verdadeiro-falso') renderVfSimulado();
-    if (tabId === 'flash-write') renderFlashWrite(); // ATUALIZADO
+    if (tabId === 'flash-write') renderFlashWrite(); 
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Apenas a aba de flashcards é inicializada ao carregar
     showTab('flashcards');
-    // Renderiza todas na inicialização, mas apenas a 'flashcards' estará visível
-    renderFlashCards();
-    renderSimulado();
-    renderVfSimulado();
-    renderFlashWrite(); // ATUALIZADO
 });
 
 
@@ -593,7 +569,7 @@ document.getElementById('study-form').addEventListener('submit', function(e) {
         this.reset();
         alert('Item adicionado com sucesso!');
         
-        // Renderiza apenas os cards da aba ativa, chamando showTab
+        // Renderiza a aba ativa
         const activeTab = document.querySelector('.tab-content.active').id;
         showTab(activeTab); 
     } else {
@@ -608,17 +584,16 @@ function deleteFlashCard(originalIndex) {
     if (confirm(`Tem certeza que deseja excluir o item "${studyData[originalIndex].pergunta}"?`)) {
         studyData.splice(originalIndex, 1);
         saveStudyData();
-        // Renderiza todas as abas, pois o conjunto de dados mudou
-        renderFlashCards();
-        renderSimulado();
-        renderVfSimulado(); 
-        renderFlashWrite();
+        // Renderiza a aba ativa (não precisa renderizar todas)
+        const activeTab = document.querySelector('.tab-content.active').id;
+        showTab(activeTab);
     }
 }
 
 function startEdit(originalIndex) {
+    // Garante que apenas um cartão está em modo de edição por vez
     if (editingIndex !== -1 && editingIndex !== originalIndex) {
-        renderFlashCards();
+        renderFlashCards(); // Re-renderiza para fechar o anterior
     }
     editingIndex = originalIndex;
     renderFlashCards(); 
@@ -634,11 +609,9 @@ function saveEdit(originalIndex) {
         
         editingIndex = -1;
         saveStudyData();
-        // Renderiza todas as abas, pois o conteúdo dos dados mudou
-        renderFlashCards();
-        renderSimulado();
-        renderVfSimulado();
-        renderFlashWrite();
+        // Renderiza a aba ativa
+        const activeTab = document.querySelector('.tab-content.active').id;
+        showTab(activeTab);
         alert('Item atualizado com sucesso!');
     } else {
         alert('Pergunta e Resposta não podem estar vazias.');
@@ -657,6 +630,11 @@ function renderFlashCards() {
 
     const limitedData = getShuffledAndLimitedData(); 
 
+    if (limitedData.length === 0) {
+        container.innerHTML = '<p>Adicione um item de estudo para começar!</p>';
+        return;
+    }
+
     limitedData.forEach((item) => {
         const wrapper = document.createElement('div');
         wrapper.className = 'flashcard-wrapper';
@@ -664,377 +642,370 @@ function renderFlashCards() {
         // Mapeia o item aleatório de volta para o índice original para ações de CRUD
         const originalIndex = studyData.findIndex(d => d.pergunta === item.pergunta && d.resposta === item.resposta);
 
-
         if (originalIndex === editingIndex) {
             // Renderiza o formulário de edição
             wrapper.innerHTML = `
-                <div class="edit-form">
-                    <h4>Editando Item ${originalIndex + 1}</h4>
-                    <label>Frente:</label>
-                    <textarea id="edit-pergunta-${originalIndex}">${item.pergunta}</textarea>
-                    
-                    <label>Verso:</label>
-                    <textarea id="edit-resposta-${originalIndex}">${item.resposta}</textarea>
-                    
-                    <div class="card-controls">
-                        <button type="button" class="control-btn save" onclick="saveEdit(${originalIndex})">Salvar</button>
-                        <button type="button" class="control-btn cancel" onclick="cancelEdit()">Cancelar</button>
+                <div class="flashcard editing">
+                    <input type="text" id="edit-pergunta-${originalIndex}" value="${item.pergunta.replace(/"/g, '&quot;')}" required>
+                    <textarea id="edit-resposta-${originalIndex}" required>${item.resposta}</textarea>
+                    <div class="actions">
+                        <button onclick="saveEdit(${originalIndex})" class="save-button">Salvar</button>
+                        <button onclick="cancelEdit()" class="cancel-button">Cancelar</button>
                     </div>
                 </div>
             `;
         } else {
-            // Renderiza o Flash Card normal
+            // Renderiza o flash card normal
             wrapper.innerHTML = `
                 <div class="flashcard" onclick="this.classList.toggle('flipped')">
-                    <div class="card-inner">
-                        <div class="card-front">
-                            <p><strong>${item.pergunta}</strong></p>
-                        </div>
-                        <div class="card-back">
-                            <p>${item.resposta}</p>
-                        </div>
+                    <div class="front">
+                        <p class="question">${item.pergunta}</p>
+                    </div>
+                    <div class="back">
+                        <p class="answer">${item.resposta}</p>
                     </div>
                 </div>
-                <div class="card-controls">
-                    <button type="button" class="control-btn edit" onclick="startEdit(${originalIndex})">Editar</button>
-                    <button type="button" class="control-btn delete" onclick="deleteFlashCard(${originalIndex})">Excluir</button>
+                <div class="crud-actions">
+                    <button onclick="startEdit(${originalIndex})" class="edit-button">Editar</button>
+                    <button onclick="deleteFlashCard(${originalIndex})" class="delete-button">Excluir</button>
                 </div>
             `;
         }
-        
         container.appendChild(wrapper);
     });
 }
 
-
-// 3. Renderizar Simulado (Múltipla Escolha)
+// 3. Renderizar Simulado de Múltipla Escolha
 function renderSimulado() {
-    const form = document.getElementById('simulado-form');
-    const resultParagraph = document.getElementById('simulado-result');
-    
-    let checkButton = form.querySelector('button[onclick="checkSimulado()"]');
-    form.innerHTML = ''; 
-    form.appendChild(resultParagraph); 
+    const container = document.getElementById('simulado-container');
+    container.innerHTML = '<h3>Simulado de Múltipla Escolha (10 Questões)</h3>';
 
-    if (studyData.length === 0) {
-        form.innerHTML = '<p>Adicione itens para gerar o simulado.</p>';
+    const maxQuestions = 10;
+    const questions = getShuffledAndLimitedData(maxQuestions); 
+
+    if (questions.length < 4) {
+        container.innerHTML += '<p>São necessários no mínimo 4 itens de estudo para gerar um Simulado de Múltipla Escolha.</p>';
         return;
     }
-    
-    const limitedData = getShuffledAndLimitedData(); 
-    const distractorData = [...limitedData].sort(() => 0.5 - Math.random());
 
-    limitedData.forEach((item, index) => {
-        const questionDiv = document.createElement('div');
-        questionDiv.innerHTML = `<h4>${index + 1}. ${item.pergunta}</h4>`;
+    const form = document.createElement('form');
+    form.id = 'simulado-form';
+    form.addEventListener('submit', (e) => { e.preventDefault(); checkSimulado(); });
 
-        const correctAnswer = item.resposta;
-        const options = new Set([correctAnswer]); 
+    questions.forEach((q, index) => {
+        const itemContainer = document.createElement('div');
+        itemContainer.className = 'question-block';
         
-        for (const distractorItem of distractorData) {
-            if (options.size === 4) break; 
-            if (distractorItem.resposta !== correctAnswer) {
-                options.add(distractorItem.resposta);
-            }
-        }
-        
-        const optionArray = Array.from(options).sort(() => 0.5 - Math.random());
-
-        optionArray.forEach((option, optIndex) => {
-            const radioId = `q${index}-opt${optIndex}`;
-            questionDiv.innerHTML += `
-                <input type="radio" id="${radioId}" name="question-${index}" value="${option}" required>
-                <label for="${radioId}">${option}</label><br>
-            `;
-        });
-        
-        form.appendChild(questionDiv);
-    });
-    
-    if (!checkButton) {
-        checkButton = document.createElement('button');
-        checkButton.type = 'button';
-        checkButton.onclick = checkSimulado;
-        checkButton.textContent = 'Verificar Respostas';
-    }
-    form.appendChild(checkButton);
-}
-
-// 4. Lógica de Verificação do Simulado (Múltipla Escolha)
-function checkSimulado() {
-    let correctCount = 0;
-    const form = document.getElementById('simulado-form');
-    const resultParagraph = document.getElementById('simulado-result');
-
-    const questionDivs = Array.from(form.children).filter(el => el.tagName === 'DIV');
-    const totalQuestions = questionDivs.length;
-
-    if (totalQuestions === 0) return;
-
-    // Recria o array de dados limitados *usados atualmente* (que estão no DOM) para verificação
-    const currentQuestions = [];
-    questionDivs.forEach(div => {
-        const questionText = div.querySelector('h4').textContent.split('. ')[1];
-        const originalItem = studyData.find(d => questionText.includes(d.pergunta));
-        if (originalItem) {
-            currentQuestions.push(originalItem);
-        }
-    });
-
-    questionDivs.forEach((questionDiv, index) => {
-        const selectedRadio = form.querySelector(`input[name="question-${index}"]:checked`);
-        questionDiv.style.backgroundColor = 'transparent';
-        
-        if (selectedRadio) {
-            const userAnswer = selectedRadio.value;
-            const correctAnswer = currentQuestions[index] ? currentQuestions[index].resposta : null;
-            
-            if (userAnswer === correctAnswer) {
-                correctCount++;
-                questionDiv.style.backgroundColor = '#DFF2BF';
-            } else {
-                questionDiv.style.backgroundColor = '#FFCCCC';
-            }
-        } else {
-            questionDiv.style.backgroundColor = '#FFFACD'; 
-        }
-    });
-
-    const percentage = ((correctCount / totalQuestions) * 100).toFixed(2);
-    resultParagraph.innerHTML = `✅ **Resultado (Múltipla Escolha):** Você acertou **${correctCount}** de **${totalQuestions}** questões (${percentage}%).`;
-    resultParagraph.style.marginTop = '20px';
-}
-
-
-// 5. Renderizar Simulado (Verdadeiro ou Falso)
-function renderVfSimulado() {
-    const form = document.getElementById('vf-simulado-form');
-    const resultParagraph = document.getElementById('vf-simulado-result');
-    
-    let checkButton = form.querySelector('button[onclick="checkVfSimulado()"]');
-    form.innerHTML = ''; 
-    form.appendChild(resultParagraph); 
-
-    if (studyData.length === 0) {
-        form.innerHTML = '<p>Adicione itens para gerar o simulado de Verdadeiro ou Falso.</p>';
-        return;
-    }
-    
-    const limitedData = getShuffledAndLimitedData();
-
-    limitedData.forEach((item, index) => {
-        const questionDiv = document.createElement('div');
-        
-        const isTrueStatement = Math.random() < 0.5;
-        let statement = "";
-        let expectedAnswer = "";
-        
-        if (isTrueStatement) {
-            statement = `${item.pergunta} é **${item.resposta}**`;
-            expectedAnswer = "Verdadeiro";
-        } else {
-            let wrongAnswer = item.resposta;
-            const wrongItems = limitedData.filter(d => d.resposta !== item.resposta);
-            
-            if (wrongItems.length > 0) {
-                wrongAnswer = wrongItems[Math.floor(Math.random() * wrongItems.length)].resposta;
-            }
-            
-            statement = `${item.pergunta} é **${wrongAnswer}**`;
-            expectedAnswer = "Falso";
-        }
-        
-        questionDiv.innerHTML = `<h4>${index + 1}. A afirmação é: "${statement}"</h4>`;
-        
-        questionDiv.dataset.correctAnswer = expectedAnswer; 
-
-        questionDiv.innerHTML += `
-            <input type="radio" id="vf-q${index}-v" name="vf-question-${index}" value="Verdadeiro" required>
-            <label for="vf-q${index}-v">Verdadeiro</label><br>
-            <input type="radio" id="vf-q${index}-f" name="vf-question-${index}" value="Falso">
-            <label for="vf-q${index}-f">Falso</label><br>
+        // Questão
+        const questionHtml = `
+            <p><strong>${index + 1}. ${q.pergunta}</strong></p>
         `;
         
-        form.appendChild(questionDiv);
+        // Gerar 3 Distratores (opções erradas)
+        const allOtherAnswers = studyData
+            .filter(d => d.resposta !== q.resposta)
+            .map(d => d.resposta)
+            .sort(() => 0.5 - Math.random());
+        
+        const distractors = allOtherAnswers.slice(0, 3);
+        
+        // Combina resposta correta e distratores
+        let options = [q.resposta, ...distractors].sort(() => 0.5 - Math.random());
+        
+        let optionsHtml = options.map((option, optIndex) => `
+            <label class="option-label">
+                <input type="radio" name="question-${index}" value="${option.replace(/"/g, '&quot;')}" required>
+                ${String.fromCharCode(65 + optIndex)}. ${option}
+            </label>
+        `).join('');
+
+        itemContainer.innerHTML = questionHtml + '<div class="options-container">' + optionsHtml + '</div>';
+        form.appendChild(itemContainer);
     });
+
+    form.innerHTML += '<button type="submit" class="check-button">Verificar Respostas</button>';
+    const resultP = document.createElement('p');
+    resultP.id = 'simulado-result';
     
-    if (!checkButton) {
-        checkButton = document.createElement('button');
-        checkButton.type = 'button';
-        checkButton.onclick = checkVfSimulado;
-        checkButton.textContent = 'Verificar Respostas';
-    }
-    form.appendChild(checkButton);
+    container.appendChild(form);
+    container.appendChild(resultP);
 }
 
-// 6. Lógica de Verificação do Simulado (Verdadeiro ou Falso)
-function checkVfSimulado() {
-    let correctCount = 0;
-    const form = document.getElementById('vf-simulado-form');
-    const resultParagraph = document.getElementById('vf-simulado-result');
-    
-    const questionDivs = Array.from(form.children).filter(el => el.tagName === 'DIV');
-    const totalQuestions = questionDivs.length;
+function checkSimulado() {
+    const form = document.getElementById('simulado-form');
+    const resultP = document.getElementById('simulado-result');
+    let score = 0;
+    let total = 0;
+    let detailedResults = '';
 
-    if (totalQuestions === 0) return;
+    const questions = getShuffledAndLimitedData(10); // Obtém as mesmas 10 questões
 
-    questionDivs.forEach((questionDiv, index) => {
-        const selectedRadio = form.querySelector(`input[name="vf-question-${index}"]:checked`);
-        const expectedAnswer = questionDiv.dataset.correctAnswer;
-        
-        questionDiv.style.backgroundColor = 'transparent';
-        
-        if (selectedRadio) {
-            const userAnswer = selectedRadio.value;
-            if (userAnswer === expectedAnswer) {
-                correctCount++;
-                questionDiv.style.backgroundColor = '#DFF2BF';
-            } else {
-                questionDiv.style.backgroundColor = '#FFCCCC';
+    questions.forEach((q, index) => {
+        total++;
+        const radioName = `question-${index}`;
+        const selectedOption = form.querySelector(`input[name="${radioName}"]:checked`);
+        const correct = q.resposta;
+        let isCorrect = false;
+
+        if (selectedOption) {
+            const userAnswer = selectedOption.value;
+            if (userAnswer === correct) {
+                score++;
+                isCorrect = true;
             }
-        } else {
-            questionDiv.style.backgroundColor = '#FFFACD'; 
         }
+        
+        detailedResults += `<p class="${isCorrect ? 'correct' : 'incorrect'}"><strong>Questão ${index + 1}:</strong> Sua resposta: ${selectedOption ? selectedOption.value : 'NÃO RESPONDIDA'}. Correta: ${correct}</p>`;
     });
 
-    const percentage = ((correctCount / totalQuestions) * 100).toFixed(2);
-    resultParagraph.innerHTML = `✅ **Resultado (V/F):** Você acertou **${correctCount}** de **${totalQuestions}** afirmações (${percentage}%).`;
-    resultParagraph.style.marginTop = '20px';
-}
-
-
-// --- 7 & 8: FUNÇÕES DO DESAFIO DE ESCRITA RÁPIDA (FLASH WRITE) ---
-
-// 7. Renderizar Desafio de Escrita Rápida (Flash Write)
-function renderFlashWrite() {
-    const form = document.getElementById('flash-write-form');
-    const resultParagraph = document.getElementById('flash-write-result');
-    const timerDisplay = document.getElementById('timer-display');
-    
-    // Limpa o formulário, mas mantém os elementos de controle
-    let checkButton = form.querySelector('button[onclick="checkFlashWrite()"]');
-    form.innerHTML = ''; 
-    form.appendChild(timerDisplay); 
-    form.appendChild(resultParagraph); 
-
-    if (studyData.length === 0) {
-        form.innerHTML = '<p>Adicione itens para iniciar o Desafio de Escrita Rápida.</p>';
-        return;
-    }
-    
-    // Zera o índice e pega os 25 itens da sessão
-    currentFlashWriteQuestionIndex = 0;
-    currentFlashWriteData = getShuffledAndLimitedData();
-    
-    if (currentFlashWriteData.length > 0) {
-        displayFlashWriteQuestion(form, checkButton);
-    } else {
-        form.innerHTML = '<p>Não há itens suficientes para o desafio.</p>';
-    }
-}
-
-// Função para exibir a pergunta atual do Flash Write
-function displayFlashWriteQuestion(form, checkButton) {
-    clearTimeout(flashWriteTimer);
-    const resultParagraph = document.getElementById('flash-write-result');
-    resultParagraph.innerHTML = ''; // Limpa resultados anteriores
-
-    if (currentFlashWriteQuestionIndex >= currentFlashWriteData.length) {
-        form.innerHTML = '<p style="font-size: 1.2em; color: #4169E1;">Fim do Desafio! Recarregue a página ou troque de aba para um novo conjunto.</p>';
-        return;
-    }
-
-    const item = currentFlashWriteData[currentFlashWriteQuestionIndex];
-
-    const questionDiv = document.createElement('div');
-    questionDiv.innerHTML = `<h4>${currentFlashWriteQuestionIndex + 1}. ${item.pergunta}</h4>`;
-    questionDiv.className = 'flash-write-question';
-    
-    questionDiv.innerHTML += `
-        <textarea id="flash-write-input" name="flash-write-response" placeholder="Sua resposta rápida aqui..."></textarea>
-        <div id="flash-write-answer" style="margin-top: 15px; padding: 10px; border: 1px dashed #B0E0E6; background: #fffaf0; display: none;">
-            <p style="font-weight: bold; color: #4682B4;">Resposta Correta:</p>
-            <p>${item.resposta}</p>
+    resultP.innerHTML = `
+        <div class="simulado-score">
+            Resultado: Você acertou **${score}** de **${total}**!
+        </div>
+        <div class="simulado-details">
+            ${detailedResults}
         </div>
     `;
-    
-    // Remove as perguntas anteriores antes de adicionar a nova
-    form.querySelectorAll('.flash-write-question').forEach(q => q.remove());
-    form.insertBefore(questionDiv, document.getElementById('timer-display').nextSibling);
+}
 
+// 4. Renderizar Simulado Verdadeiro ou Falso
+function renderVfSimulado() {
+    const container = document.getElementById('verdadeiro-falso-container');
+    container.innerHTML = '<h3>Simulado de Verdadeiro ou Falso (10 Questões)</h3>';
 
-    // Re-adiciona ou cria o botão de verificar
-    if (!checkButton) {
-        checkButton = document.createElement('button');
-        checkButton.type = 'button';
-        checkButton.onclick = checkFlashWrite;
-        checkButton.textContent = 'Comparar e Avaliar';
+    const maxQuestions = 10;
+    const questions = getShuffledAndLimitedData(maxQuestions); 
+
+    if (questions.length < 1) {
+        container.innerHTML += '<p>Adicione mais itens de estudo para gerar o Simulado V/F.</p>';
+        return;
     }
-    form.appendChild(checkButton);
+
+    const form = document.createElement('form');
+    form.id = 'vf-simulado-form';
+    form.addEventListener('submit', (e) => { e.preventDefault(); checkVfSimulado(); });
+
+    questions.forEach((q, index) => {
+        const isStatementCorrect = Math.random() > 0.5; // Decide se a afirmação será correta ou não
+        let statement;
+        let expectedAnswer;
+
+        if (isStatementCorrect) {
+            // Afirmação Correta: Pergunta é igual à resposta
+            statement = `${q.pergunta}: ${q.resposta}`;
+            expectedAnswer = 'V';
+        } else {
+            // Afirmação Incorreta: Mistura a resposta com uma resposta errada de outro item
+            const wrongAnswer = studyData
+                .filter(d => d.resposta !== q.resposta)
+                .sort(() => 0.5 - Math.random())[0]?.resposta || 'Resposta Alternativa Falsa.';
+
+            statement = `${q.pergunta}: ${wrongAnswer}`;
+            expectedAnswer = 'F';
+        }
+        
+        // Armazena a resposta esperada no dataset do form (oculto)
+        form.dataset[`q${index}`] = expectedAnswer;
+
+
+        const itemContainer = document.createElement('div');
+        itemContainer.className = 'question-block vf-block';
+        itemContainer.innerHTML = `
+            <p><strong>${index + 1}.</strong> ${statement}</p>
+            <div class="options-container">
+                <label class="option-label vf-v">
+                    <input type="radio" name="vf-question-${index}" value="V" required>
+                    Verdadeiro (V)
+                </label>
+                <label class="option-label vf-f">
+                    <input type="radio" name="vf-question-${index}" value="F" required>
+                    Falso (F)
+                </label>
+            </div>
+        `;
+        form.appendChild(itemContainer);
+    });
+
+    form.innerHTML += '<button type="submit" class="check-button">Verificar Respostas</button>';
+    const resultP = document.createElement('p');
+    resultP.id = 'vf-simulado-result';
     
+    container.appendChild(form);
+    container.appendChild(resultP);
+}
+
+function checkVfSimulado() {
+    const form = document.getElementById('vf-simulado-form');
+    const resultP = document.getElementById('vf-simulado-result');
+    let score = 0;
+    let total = 0;
+    let detailedResults = '';
+
+    const questionsBlocks = form.querySelectorAll('.question-block');
+
+    questionsBlocks.forEach((block, index) => {
+        total++;
+        const radioName = `vf-question-${index}`;
+        const selectedOption = form.querySelector(`input[name="${radioName}"]:checked`);
+        const expectedAnswer = form.dataset[`q${index}`];
+        let isCorrect = false;
+
+        if (selectedOption) {
+            const userAnswer = selectedOption.value;
+            if (userAnswer === expectedAnswer) {
+                score++;
+                isCorrect = true;
+            }
+        }
+        
+        const questionText = block.querySelector('p').innerText;
+        detailedResults += `<p class="${isCorrect ? 'correct' : 'incorrect'}"><strong>Questão ${index + 1}:</strong> ${questionText.substring(0, 50)}... - Resposta Correta: ${expectedAnswer}. Sua Resposta: ${selectedOption ? selectedOption.value : 'NÃO RESPONDIDA'}</p>`;
+    });
+
+    resultP.innerHTML = `
+        <div class="simulado-score">
+            Resultado: Você acertou **${score}** de **${total}**!
+        </div>
+        <div class="simulado-details">
+            ${detailedResults}
+        </div>
+    `;
+}
+
+// 5. Desafio de Escrita Rápida (Flash Write)
+function renderFlashWrite() {
+    const container = document.getElementById('flash-write-container');
+    container.innerHTML = '<h3>Desafio de Escrita Rápida (20s)</h3><p>Tente escrever o conceito o mais rápido e completo possível. A precisão da digitação é por sua conta, o foco é na recuperação do conceito!</p>';
+
+    // Se estiver rodando, não renderiza o botão de início
+    if (flashWriteRunning) {
+        // Renderiza a pergunta atual
+        container.appendChild(renderFlashWriteQuestion(currentFlashWriteData[currentFlashWriteQuestionIndex]));
+        return;
+    }
+
+    // Botão para iniciar
+    const startButton = document.createElement('button');
+    startButton.textContent = `Iniciar Desafio (${MAX_ITENS} Itens)`;
+    startButton.className = 'start-button';
+    startButton.onclick = startFlashWrite;
+
+    container.appendChild(startButton);
+
+    const resultP = document.createElement('p');
+    resultP.id = 'flash-write-result';
+    container.appendChild(resultP);
+}
+
+function startFlashWrite() {
+    if (studyData.length < 1) {
+        alert('Adicione itens de estudo antes de iniciar o desafio.');
+        return;
+    }
+    
+    // Obtém um novo conjunto de dados para a sessão
+    currentFlashWriteData = getShuffledAndLimitedData(MAX_ITENS);
+    currentFlashWriteQuestionIndex = 0;
+    flashWriteRunning = true;
+    
+    document.getElementById('flash-write-result').innerHTML = ''; // Limpa resultados anteriores
+
+    renderFlashWrite();
     startFlashWriteTimer();
 }
 
-// Função de Controle do Cronômetro
+function renderFlashWriteQuestion(item) {
+    const questionContainer = document.createElement('form');
+    questionContainer.id = 'flash-write-form';
+    questionContainer.innerHTML = `
+        <p id="timer-display" style="font-weight: bold; color: #FF6347; margin-top: 15px; font-size: 1.2em;">Tempo restante: ${FLASH_WRITE_TIME_SECONDS}s</p>
+        <p><strong>Conceito para Escrever:</strong> ${item.pergunta}</p>
+        <textarea id="flash-write-input" rows="5" placeholder="Escreva a resposta aqui..." autofocus></textarea>
+        <button type="button" onclick="checkFlashWrite()" class="check-button" id="flash-write-button">Comparar e Próximo</button>
+    `;
+    return questionContainer;
+}
+
 function startFlashWriteTimer() {
     let timeLeft = FLASH_WRITE_TIME_SECONDS;
     const timerDisplay = document.getElementById('timer-display');
     const inputField = document.getElementById('flash-write-input');
-    const checkButton = document.querySelector('#flash-write-form button[onclick="checkFlashWrite()"]');
+    const checkButton = document.getElementById('flash-write-button');
 
-    if (inputField) inputField.disabled = false;
-    if (checkButton) checkButton.disabled = false;
+    timerDisplay.textContent = `Tempo restante: ${timeLeft}s`;
     
-    timerDisplay.textContent = `Tempo restante: ${timeLeft} segundos`;
+    stopFlashWriteTimer(); // Limpa qualquer timer anterior
 
     flashWriteTimer = setInterval(() => {
         timeLeft--;
-        timerDisplay.textContent = `Tempo restante: ${timeLeft} segundos`;
+        if (timerDisplay) timerDisplay.textContent = `Tempo restante: ${timeLeft}s`;
 
         if (timeLeft <= 0) {
-            clearInterval(flashWriteTimer);
-            timerDisplay.textContent = '⏰ Tempo Esgotado! Avalie sua resposta.';
+            stopFlashWriteTimer();
             if (inputField) inputField.disabled = true;
-            // Força a exibição da resposta
-            document.getElementById('flash-write-answer').style.display = 'block'; 
+            if (checkButton) checkButton.textContent = 'Tempo Esgotado! Comparar e Próximo';
         }
     }, 1000);
 }
 
-// 8. Lógica de Verificação do Flash Write (Autoavaliação)
-function checkFlashWrite() {
-    clearTimeout(flashWriteTimer);
-    const inputField = document.getElementById('flash-write-input');
-    const answerDiv = document.getElementById('flash-write-answer');
-    const resultParagraph = document.getElementById('flash-write-result');
-    const checkButton = document.querySelector('#flash-write-form button[onclick="checkFlashWrite()"]');
-
-    if (inputField) inputField.disabled = true;
-    if (checkButton) checkButton.disabled = true;
-    
-    // 1. Revela a Resposta Correta
-    answerDiv.style.display = 'block';
-
-    // 2. Apresenta a Autoavaliação
-    resultParagraph.innerHTML = `
-        <div style="margin-top: 20px; padding: 15px; border: 2px solid #5F9EA0; border-radius: 8px; background: #E0FFFF;">
-            <p style="font-weight: bold; color: #4682B4;">Como você avalia sua resposta?</p>
-            <button class="control-btn save" style="margin-right: 10px;" onclick="nextFlashWriteQuestion('Fácil')">Fácil (Acertei)</button>
-            <button class="control-btn edit" style="margin-right: 10px; background: #FFD700;" onclick="nextFlashWriteQuestion('Médio')">Médio (Houve Hesitação)</button>
-            <button class="control-btn delete" onclick="nextFlashWriteQuestion('Difícil')">Difícil (Errei)</button>
-        </div>
-    `;
+function stopFlashWriteTimer() {
+    if (flashWriteTimer) {
+        clearInterval(flashWriteTimer);
+        flashWriteTimer = null;
+    }
+    flashWriteRunning = false;
 }
 
-// 9. Avançar para a próxima pergunta
-function nextFlashWriteQuestion(rating) {
-    // Nesta função, a lógica futura de Repetição Espaçada seria acionada.
-    console.log(`Questão ${currentFlashWriteQuestionIndex + 1} avaliada como: ${rating}`);
+function checkFlashWrite() {
+    if (!flashWriteRunning) return;
+
+    stopFlashWriteTimer();
+
+    const resultP = document.getElementById('flash-write-result');
+    const currentItem = currentFlashWriteData[currentFlashWriteQuestionIndex];
+    const userAnswer = document.getElementById('flash-write-input').value.trim();
+    const correctAnswer = currentItem.resposta;
     
+    // Simples comparação de pontuação (apenas para exibição)
+    const similarity = calculateJaccardSimilarity(userAnswer.toLowerCase(), correctAnswer.toLowerCase());
+    
+    let resultHtml = `
+        <div class="write-result-block">
+            <p><strong>Conceito:</strong> ${currentItem.pergunta}</p>
+            <p><strong>Sua Resposta:</strong> ${userAnswer || 'Nenhuma resposta fornecida.'}</p>
+            <p class="correct-answer"><strong>Resposta Correta:</strong> ${correctAnswer}</p>
+            <p class="score-indicator">Similaridade (Jaccard): **${(similarity * 100).toFixed(2)}%**</p>
+        </div>
+    `;
+
+    resultP.innerHTML = resultHtml;
+
+    // Próxima pergunta
     currentFlashWriteQuestionIndex++;
     
-    const form = document.getElementById('flash-write-form');
-    const checkButton = document.querySelector('#flash-write-form button[onclick="checkFlashWrite()"]');
+    if (currentFlashWriteQuestionIndex < currentFlashWriteData.length) {
+        // Continua
+        setTimeout(() => {
+            renderFlashWrite();
+            startFlashWriteTimer();
+        }, 3000); // Espera 3 segundos antes de ir para a próxima questão
+    } else {
+        // Fim da sessão
+        stopFlashWriteTimer();
+        resultP.innerHTML += `<div class="final-score"><h3>Fim do Desafio! Você revisou ${currentFlashWriteData.length} itens.</h3></div>`;
+        flashWriteRunning = false;
+        renderFlashWrite(); // Renderiza o botão de iniciar novamente
+    }
+}
+
+// Função utilitária para calcular Similaridade (ex: Jaccard) para o Flash Write
+// Simples e funcional para comparação de textos
+function calculateJaccardSimilarity(str1, str2) {
+    const set1 = new Set(str1.split(/\s+/));
+    const set2 = new Set(str2.split(/\s+/));
     
-    displayFlashWriteQuestion(form, checkButton);
+    const intersection = new Set([...set1].filter(x => set2.has(x)));
+    const union = new Set([...set1, ...set2]);
+    
+    return union.size === 0 ? 0 : intersection.size / union.size;
 }
