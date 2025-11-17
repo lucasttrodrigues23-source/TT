@@ -6,6 +6,7 @@
     <title>Estudo Integrado: Base de Dados Jurídica</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <header>
         <h1>TSJ Estudo Integrado</h1>
@@ -13,7 +14,7 @@
 
     <main>
         <section id="input-section">
-            <h2> Adicionar Novo Item de Estudo</h2>
+            <h2>Adicionar Novo Item de Estudo</h2>
             <form id="study-form">
                 <label for="pergunta">Frente (Pergunta/Conceito):</label>
                 <input type="text" id="pergunta" required>
@@ -29,34 +30,38 @@
             <div class="tabs">
                 <button class="tab-button active" onclick="showTab('flashcards')">Flash Cards</button>
                 <button class="tab-button" onclick="showTab('simulado')">Simulado (Múltipla Escolha)</button>
-                <button class="tab-button" onclick="showTab('verdadeiro-falso')">Simulado (V/F)</button> 
-                <button class="tab-button" onclick="showTab('flash-write')">✍️ Desafio de Escrita Rápida</button> 
+                <button class="tab-button" onclick="showTab('verdadeiro-falso')">Simulado (V/F)</button>
+                <button class="tab-button" onclick="showTab('flash-write')">✍️ Desafio de Escrita Rápida</button>
             </div>
 
+            <!-- Flashcards -->
             <div id="flashcards" class="tab-content active">
                 <h3>Meus Flash Cards</h3>
-                <div id="flashcard-container" class="card-grid">
-                    </div>
+                <div id="flashcard-container" class="card-grid"></div>
             </div>
 
+            <!-- Simulado Múltipla Escolha -->
             <div id="simulado" class="tab-content">
                 <div id="simulado-container">
                     <h3>Simulado de Múltipla Escolha</h3>
-                    </div>
+                </div>
             </div>
-            
+
+            <!-- Simulado Verdadeiro/Falso -->
             <div id="verdadeiro-falso" class="tab-content">
                 <div id="verdadeiro-falso-container">
                     <h3>Simulado de Verdadeiro ou Falso</h3>
-                    </div>
+                </div>
             </div>
 
+            <!-- Escrita Rápida -->
             <div id="flash-write" class="tab-content">
                 <div id="flash-write-container">
                     <h3>Desafio de Escrita Rápida (20s)</h3>
-                    <p>Tente escrever o conceito o mais rápido e completo possível. A precisão da digitação é por sua conta, o foco é na recuperação do conceito!</p>
-                    </div>
+                    <p>Tente escrever o conceito o mais rápido e completo possível. A precisão da digitação é por sua conta — o foco é na recuperação do conceito!</p>
+                </div>
             </div>
+
         </section>
     </main>
 
